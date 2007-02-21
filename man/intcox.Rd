@@ -31,7 +31,8 @@ intcox(formula = formula(data), data = parent.frame(), subset, na.action, x = FA
   direction weighted by the main diagonal elements of the negative Hessian matrix. 
 }
 \value{
-  an object of class \code{"coxph"}. See \code{\link[survival]{coxph.object}} for details. Not all features are realised. 
+  an object of class \code{"coxph"}. See \code{\link[survival]{coxph.object}} for details. Not all features are realised.
+  Not realized features result in \code{NA}, e.g. \code{se}, \code{z} and \code{p}. 
   Additionally there are given 
   \item{lambda0 }{ estimated baseline hazard }
   \item{time.point }{corresponding time points for the steps}

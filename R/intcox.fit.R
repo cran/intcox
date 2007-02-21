@@ -1,4 +1,4 @@
-"intcox.fit" <-
+`intcox.fit` <-
 function (formula, data, covar, eps, itermax)                       # Iterated Convex Minorant Algorithm 
 {
     folge <- sort.list(c(data$left, data$right[data$cens == 3]))    # sorting the pooled ends
@@ -138,3 +138,4 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
         likeli.vec = likeli.vec, iter = it, termination = abbruch)
     return(intcox.ret)
 }
+

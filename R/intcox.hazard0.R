@@ -1,4 +1,4 @@
-"intcox.hazard0" <-
+`intcox.hazard0` <-
 function (t, data, rate)        # baseline hazard
 {
     mini <- min(data$left)
@@ -11,3 +11,4 @@ function (t, data, rate)        # baseline hazard
     }
     return(hazard0)
 }
+

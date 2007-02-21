@@ -1,4 +1,4 @@
-"intcox.breslow" <-
+`intcox.breslow` <-
 function (formula, data, covar)             # Breslow-Estimator
 {
     lokal.cens <- data$cens/3
@@ -15,3 +15,4 @@ function (formula, data, covar)             # Breslow-Estimator
     breslow.ret <- list(cumhaz = cumhaz, fit = fit)
     return(breslow.ret)
 }
+

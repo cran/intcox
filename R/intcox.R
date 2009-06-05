@@ -1,4 +1,4 @@
-`intcox` <-
+"intcox" <-
 function (formula = formula(data), data = parent.frame(), subset, 
     na.action, x = FALSE, y = TRUE, epsilon = 1e-04, itermax = 10000, 
     no.warnings = FALSE) 
@@ -33,9 +33,6 @@ function (formula = formula(data), data = parent.frame(), subset,
                 Y <- cbind(Y[, 1:2], Y[, 3])
             else Y <- cbind(Y[, 1], Y[, 3])
         }
-        Y[, 2] <- ifelse(Y[, 2] == 1 & Y[,3]==0, NA, Y[, 2])
-        if (any(Y[, 1] == 0 && Y[, 3] == 0)) 
-            stop("zero is no survival time")
     }
     copy.data$left <- Y[, 1]
     copy.data$right <- Y[, 2]
@@ -99,4 +96,3 @@ function (formula = formula(data), data = parent.frame(), subset,
     }
     return(intcox.new)
 }
-

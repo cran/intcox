@@ -45,10 +45,9 @@ role of the primary endpoint in clinical studies. But, like the
 recurrence of a tumor, the time of its occurrence cannot be
 exactly observed. Events which are known to occur only within
 intervals represent interval censored event data.\\
-Especially of interest is the influence of a covariate vector 
-\textbf{x} on the probability of the occurrence of events which is 
-formalized by the survival function 
-$S(t|\mathbf{x})=1-F(t|\mathbf{x})$ with $F$ the cumulative 
+Especially of interest is the influence of a covariate vector x on
+the probability of the occurrence of events which is formalized by
+the survival function $S(t|x)=1-F(t|x)$ with $F$ the cumulative 
 distribution function.\\
 In case of right censored event data, the quantification is
 achieved by applying the extended proportional hazard model of
@@ -86,7 +85,7 @@ available in commercial software products.
 \section{Mathematical Background}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The proportional hazards assumption combines the covariate vector
-\textbf{x} and the vector of regression coefficients
+$\mathbf{x}$ and the vector of regression coefficients
 $\boldsymbol\beta$ via a linear predictor with the baseline hazard
 $\lambda _0(t)$:
 \[\lambda (t,\mathbf{x})=\lambda _0(t)\exp\{\boldsymbol\beta'\mathbf{x}\}.\]
@@ -162,14 +161,13 @@ aneurisms associated with cerebral arteriovenous malformations
 the aneurism to below 50\verb-%- of the baseline volume was of
 interest. Several patients had multiple aneurisms. Each patient
 was inspected at a random inspection time $obs.t$. The censoring
-variable $cens$ was set to one, if at the inspection time 
-sufficient shrinkage was observed, else the censoring indicator 
-was set to zero.\\
+variable $z$ was set to one, if at the inspection time sufficient
+shrinkage was observed, else the censoring indicator was set to
+zero.\\
 Two covariates were considered: the degree of cAMV occlusion by
-embolization (dichotomized at 50\verb-%-
-, variable $mo$) and the location of the aneurism, whether at the 
-midline arteries or at other afferent cerebral arteries, variable 
-$loc$.\\
+embolization (dichotomized at 50\verb-%-, variable $mo$)
+and the location of the aneurism, whether at the midline arteries
+or at other afferent cerebral arteries, variable $lok$.\\
 The single aneurisms are not independent because aneurisms within
 a patient may shrink in the same way (because the share the same
 "environment"). Multiple aneurisms were observed per patient. This
@@ -179,25 +177,27 @@ The data is loaded and inspected for the first five patients.
 <<aneurism load>>= 
 library(survival) 
 library(intcox) 
-data(aneurism.data)
-aneurism.data[1:11,] 
+data(AA.data)
+AA.data[1:11,] 
 @ 
 The data is analyzed by applying the
 \texttt{intcox} algorithm. The algorithm requires the interval
 censored observation given in interval format with left and right
-boundaries. The \texttt{Surv} function does not allow the use of 
-current status censored data as given in the aneurism example. In 
-the case of an observed event $left$ is set to zero, the observed 
-time becomes $right$. In case of right censored data the observed 
-event time becomes $left$, the right boundaries are set arbitrary 
-to \texttt{NA}.\\
+boundaries. The \texttt{Surv} function does not allow the use of
+current status censored data as given in the aneurism example. In
+case of right censored data the right boundaries are set arbitrary
+to \texttt{NA}. 
+<<aneurism preparation>>=
+AA.data$t.left<-ifelse(AA.data$z==1,0,AA.data$obs.t)
+AA.data$t.right<-ifelse(AA.data$z==1,AA.data$obs.t,NA)
+@
 The fit with \texttt{intcox} gives an object of class "coxph"
 without the standard errors of the regression coefficients. The
 summary function for class "coxph" allows to summarize the output
 of the estimation procedure.
 <<aneurism fit>>=
-aneurism.fit<-intcox(Surv(left,right,type="interval2")~mo+loc,data=aneurism.data)
-summary(aneurism.fit)
+AA.fit<-intcox(Surv(t.left,t.right,type="interval2")~mo+lok,data=AA.data)
+summary(AA.fit)
 @
 Additionally to the components of a class "coxph" object there are
 given:
@@ -216,12 +216,12 @@ Help for details), 1 indicates that the algorithm converged.
 The estimated coefficients and cumulative baseline hazard can be
 used to estimated and plot group specific survival curves.
 <<aneurismplot, fig=TRUE>>=
-surv.base<-exp(-aneurism.fit$lambda0)
-plot(aneurism.fit$time.point,surv.base,type="s",xlab="time [years]",ylab="Survival function",lty=1)
-lines(aneurism.fit$time.point,surv.base^exp(aneurism.fit$coefficients["mo"]),type="s",lty=2)
-lines(aneurism.fit$time.point,surv.base^exp(aneurism.fit$coefficients["loc"]),type="s",lty=3)
-lines(aneurism.fit$time.point,surv.base^exp(sum(aneurism.fit$coefficients[c("mo","loc")])),type="s",lty=5)
-leg.names<-c("mo=0, loc=0", "mo=0, loc=1","mo=1, loc=0","mo=1, loc=1")
+surv.base<-exp(-AA.fit$lambda0)
+plot(AA.fit$time.point,surv.base,type="s",xlab="time [years]",ylab="Survival function",lty=1)
+lines(AA.fit$time.point,surv.base^exp(AA.fit$coefficients["mo"]),type="s",lty=2)
+lines(AA.fit$time.point,surv.base^exp(AA.fit$coefficients["lok"]),type="s",lty=3)
+lines(AA.fit$time.point,surv.base^exp(sum(AA.fit$coefficients[c("mo","lok")])),type="s",lty=5)
+leg.names<-c("mo=0, lok=0", "mo=0, lok=1","mo=1, lok=0","mo=1, lok=1")
 legend(4,1,leg.names,lty=c(1,2,3,5),bty="n")
 @
 
@@ -241,34 +241,34 @@ low number of nine is only chosen for a fast check by CRAN.
 \end{remark}
 <<aneurism bootstrap>>=
 set.seed(123)
-pat<-unique(aneurism.data$gr)
-intcox.boot.aneurism<-function(i,form) {
+pat<-unique(AA.data$gr)
+intcox.boot.AA<-function(i,form) {
    boot.sample<-sample(pat,length(pat),replace=T)
-   data.ind<-unlist(lapply(boot.sample,function(x,yy) which(yy==x),yy=aneurism.data$gr))
-   data.sample<-aneurism.data[data.ind,]
+   data.ind<-unlist(lapply(boot.sample,function(x,yy) which(yy==x),yy=AA.data$gr))
+   data.sample<-AA.data[data.ind,]
    boot.fit<-intcox(form,data=data.sample, no.warnings = TRUE)
    return(list(coef=coef(boot.fit),term=boot.fit$termination))
    }
 n.rep<-9                                #to be set on something like 999
-aneurism.boot<-lapply(1:n.rep,intcox.boot.aneurism,form=Surv(left,right,type="interval2")~mo+loc)
-aneurism.boot<-matrix(unlist(aneurism.boot),byrow=T,nrow=n.rep)
-colnames(aneurism.boot)<-c(names(coef(aneurism.fit)),"termination")
+AA.boot<-lapply(1:n.rep,intcox.boot.AA,form=Surv(t.left,t.right,type="interval2")~mo+lok)
+AA.boot<-matrix(unlist(AA.boot),byrow=T,nrow=n.rep)
+colnames(AA.boot)<-c(names(coef(AA.fit)),"termination")
 inf.level<-0.05 
-mo.ord<-order(aneurism.boot[,"mo"])
-loc.ord<-order(aneurism.boot[,"loc"])
+mo.ord<-order(AA.boot[,"mo"])
+lok.ord<-order(AA.boot[,"lok"])
 pos.lower<-ceiling((n.rep+1)*(inf.level/2))
 pos.upper<-ceiling((n.rep+1)*(1-inf.level/2))
-ci.mo<-aneurism.boot[mo.ord,"mo"][c(pos.lower,pos.upper)]
-ci.loc<-aneurism.boot[mo.ord,"loc"][c(pos.lower,pos.upper)] 
+ci.mo<-AA.boot[mo.ord,"mo"][c(pos.lower,pos.upper)]
+ci.lok<-AA.boot[mo.ord,"lok"][c(pos.lower,pos.upper)] 
 ci.mo 
-ci.loc
-summary(aneurism.boot[,"mo"]) 
-summary(aneurism.boot[,"loc"])
-bias.mo<-c(mean.bias=coef(aneurism.fit)["mo"]-mean(aneurism.boot[,"mo"]),median.bias=coef(aneurism.fit)["mo"]-median(aneurism.boot[,"mo"]))
-bias.loc<-c(mean.bias=coef(aneurism.fit)["loc"]-mean(aneurism.boot[,"loc"]),median.bias=coef(aneurism.fit)["loc"]-median(aneurism.boot[,"loc"]))
+ci.lok
+summary(AA.boot[,"mo"]) 
+summary(AA.boot[,"lok"])
+bias.mo<-c(mean.bias=coef(AA.fit)["mo"]-mean(AA.boot[,"mo"]),median.bias=coef(AA.fit)["mo"]-median(AA.boot[,"mo"]))
+bias.lok<-c(mean.bias=coef(AA.fit)["lok"]-mean(AA.boot[,"lok"]),median.bias=coef(AA.fit)["lok"]-median(AA.boot[,"lok"]))
 bias.mo 
-bias.loc 
-table(aneurism.boot[,"termination"])
+bias.lok 
+table(AA.boot[,"termination"])
 @
 The analysis shows a light bias between the the ICM estimates on
 the original data and the median/mean of the bootstrap samples
@@ -290,37 +290,37 @@ value which can not be improved by the ICM algorithm. The
 occurrence of this situation will be announced by a warning.
 \item
 Model selection: Look at the following model selection problem:
-Does the model \texttt{Surv(left,right,type="interval2")$\sim$
-mo*loc} improve the fit to the data. One way to answer this
+Does the model \texttt{Surv(t.left,t.right,type="interval2")$\sim$
+mo*lok} improve the fit to the data. One way to answer this
 question is to check the bootstrap confidence interval for the
 interaction regression coefficient.
-The calculation below renders a 95\verb-%- 
-bootstrap confidence interval of $[-1.22; 1.77]$ and a small bias 
-which does not influences the statistical decision. One can conclude 
-that there is no significant interaction between the covariates with 
-respect to shrinkage.
+The calculation below renders a 95\verb-%- bootstrap confidence
+interval of $[-1.22; 1.77]$ and a small bias which does not
+influences the statistical decision. One can conclude that there
+is no significant interaction between the covariates with respect
+to shrinkage.
 \begin{remark}
 The number of replicates should be set to at least 999. The 
 low number of nine is only chosen for a fast check by CRAN.
 \end{remark}
 <<aneurism interaction>>=
-aneurism.int.fit<-intcox(Surv(left,right,type="interval2")~mo*loc,data=aneurism.data)
-summary(aneurism.int.fit)
+AA.int.fit<-intcox(Surv(t.left,t.right,type="interval2")~mo*lok,data=AA.data)
+summary(AA.int.fit)
 set.seed(234)
 n.rep<-9                                #to be set on something like 999
-aneurism.int.boot<-lapply(1:n.rep,intcox.boot.aneurism,form=Surv(left,right,type="interval2")~mo*loc)
-aneurism.int.boot<-matrix(unlist(aneurism.int.boot),byrow=T,nrow=n.rep)
-colnames(aneurism.int.boot)<-c(names(coef(aneurism.int.fit)),"termination")
+AA.int.boot<-lapply(1:n.rep,intcox.boot.AA,form=Surv(t.left,t.right,type="interval2")~mo*lok)
+AA.int.boot<-matrix(unlist(AA.int.boot),byrow=T,nrow=n.rep)
+colnames(AA.int.boot)<-c(names(coef(AA.int.fit)),"termination")
 inf.level<-0.05
-int.ord<-order(aneurism.int.boot[,"mo:loc"])
+int.ord<-order(AA.int.boot[,"mo:lok"])
 pos.lower<-ceiling((n.rep+1)*(inf.level/2))
 pos.upper<-ceiling((n.rep+1)*(1-inf.level/2))
-ci.int<-aneurism.int.boot[int.ord,"mo:loc"][c(pos.lower,pos.upper)]
+ci.int<-AA.int.boot[int.ord,"mo:lok"][c(pos.lower,pos.upper)]
 ci.int
-summary(aneurism.int.boot[,"mo:loc"])
-bias.int<-c(mean.bias=coef(aneurism.int.fit)["mo:loc"]-mean(aneurism.int.boot[,"mo:loc"]),median.bias=coef(aneurism.int.fit)["mo:loc"]-median(aneurism.int.boot[,"mo:loc"]))
+summary(AA.int.boot[,"mo:lok"])
+bias.int<-c(mean.bias=coef(AA.int.fit)["mo:lok"]-mean(AA.int.boot[,"mo:lok"]),median.bias=coef(AA.int.fit)["mo:lok"]-median(AA.int.boot[,"mo:lok"]))
 bias.int
-table(aneurism.int.boot[,"termination"])
+table(AA.int.boot[,"termination"])
 @
 \item
 Likelihood ratio test: There are caveats when using the calculated
@@ -329,8 +329,8 @@ First, we are not aware of an asymptotic theory for this test,
 second, the likelihood of the larger model may be smaller as the
 likelihood of the sparser model as can be seen in our example.
 <<aneurism LRT>>=
-aneurism.int.fit$loglik
-aneurism.fit$loglik
+AA.int.fit$loglik
+AA.fit$loglik
 @
 \end{description}
 A non-parametric approach to the data uses Turnbull's
@@ -338,16 +338,16 @@ A non-parametric approach to the data uses Turnbull's
 which is implemented in S-Plus (Insightful Corporation). The
 following S-Plus code will not work in R.
 \begin{verbatim}
-> surv.formula<-censor(left,right,cens*3,type="interval")~mo+loc
-> plot(kaplanMeier(surv.formula,data=aneurism),lty=c(1,2,3,5),
+> surv.formula<-censor(left,right,cens*3,type="interval")~mo+lok
+> plot(kaplanMeier(surv.formula,data=aneur),lty=c(1,2,3,5),
 + xlab="time (years)",ylab="Survival function")
 \end{verbatim}
-Figure \ref{aneurismkm} shows the results when applied to the four
+Figure \ref{aneurkm} shows the results when applied to the four
 subgroups of patients.
 \begin{figure}
 \begin{center}
-\includegraphics{aneurism_km}\caption{Turnbull's
-generalization of the Kaplan-Meier estimator}\label{aneurismkm}
+\includegraphics{aneur_km}\caption{Turnbull's
+generalization of the Kaplan-Meier estimator}\label{aneurkm}
 \end{center}
 \end{figure}
 The fitting of an accelerated failure time model for interval
@@ -357,31 +357,31 @@ technical reasons, the value 0 for the lower end of an interval
 had to be replaced by the equivalent of 1 day: 1/365. The Weibull
 distribution was chosen for the error term. Then the estimates of
 the coefficients can be interpreted as log-transformed relative
-hazards:  mo -1.64 [-2.88, -0.57], loc -1.22 [-2.21, -0.36]. The
+hazards:  mo -1.64 [-2.88, -0.57], lok -1.22 [-2.21, -0.36]. The
 baseline hazard is determined by intercept 0.47 [-0.36, 1.37] and
 scale 1.67 [1.25, 2.01].\\
-To reproduce the calculation, the dataset aneurism.data (columns
+To reproduce the calculation, the dataset AA.data (columns
 separated by a semicolon) is written as comma seperated value file
-"aneurism.csv" to the working directory (shown by the getwd call) and is
+"AA.csv" to the working directory (shown by the getwd call) and is
 available for the given SAS procedure.
 <<aneurism export>>=
 getwd()
-write.table(aneurism.data, file = "aneurism.csv", sep = ",", na = "." , col.names = NA)
+write.table(AA.data, file = "AA.csv", sep = ",", na = "." , col.names = NA)
 @
 \begin{verbatim}
-PROC IMPORT OUT= WORK.aneurism
-            DATAFILE= "Pfad  \aneurism.csv"
+PROC IMPORT OUT= WORK.aneur
+            DATAFILE= "Pfad  \AA.csv"
             DBMS=CSV REPLACE;
      GETNAMES=YES;
      DATAROW=2;
 RUN;
-data aneurism;
-    set aneurism;
-    if left=0 then left=1/365.25;
-    combi=2*mo+loc;
+data aneur;
+    set aneur;
+    if t_left=0 then t_left=1/365.25;
+    gruppe=2*mo+lok;
 run;
-proc lifereg data=aneurism;
-    model (left,right)=mo loc / d=weibull;
+proc lifereg data=aneur;
+    model (t_left,t_right)=mo lok / d=weibull;
     output out=outcdf cdf=cdf;
 run;
 data outcdf;
@@ -389,7 +389,7 @@ data outcdf;
     svf=1-cdf;
 run;
 proc sort data=outcdf;
-    by combi svf;
+    by gruppe svf;
 run;
 symbol1 color=black i=spline line=1;
 symbol2 color=black i=spline line=33;
@@ -400,17 +400,17 @@ LABEL=(justify=center angle=90 Rotate=0 'Survival function');
 AXIS2 Label=none MINOR=(number=1) order=(0 to 9 by 1)
 LABEL=(JUSTIFY=CENTER 'time (years)');
 LEGEND across=1 label=none position=(top right inside)
-value=('mo=0, loc=0' 'mo=0, loc=1' 'mo=1, loc=0' 'mo=1, loc=1');
+value=('mo=0, lok=0' 'mo=0, lok=1' 'mo=1, lok=0' 'mo=1, lok=1');
 proc gplot data=outcdf;
-    plot svf*left=combi / vaxis=axis1 haxis=axis2 legend=legend;
+    plot svf*t_left=gruppe / vaxis=axis1 haxis=axis2 legend=legend;
 run; quit;
 goptions reset=all;
 \end{verbatim}
-Figure \ref{aneurismpara} represents the result of the Weibull approach.
+Figure \ref{aneurpara} represents the result of the Weibull approach.
 \begin{figure}[t]
 \begin{center}
-\includegraphics{aneurism_para}\caption{Accelerated
-failure time model}\label{aneurismpara}
+\includegraphics{aneur_para}\caption{Accelerated
+failure time model}\label{aneurpara}
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -429,7 +429,7 @@ the results of a study will be interpreted. The ICM gives a rather
 rough estimate of the baseline hazard, because the PAVA smoothes
 this function to large intervals of constant hazard. As an example
 the obtained bias of the coefficients of a bootstrap of 999 samples 
-from the \texttt{intcox.example}, see HTML Help, is shown in Figure 
+from the \texttt{intcox.example}, see HTML Help, is shown in figure 
 \ref{simu}.\\
 \begin{figure}
 \begin{center}
@@ -448,7 +448,7 @@ the likelihood in case of a high percentage of right censored data
 ($>30$\verb-%-).
 In this case, the algorithm does not move away from the starting
 values calculated from the Cox model as described in the first
-paragraph of Section 2.\\
+paragraph of section 2.\\
 This work was supported by DFG grant MA 1723/2-1.
 \begin{thebibliography}{6}
 \bibitem{burr94}

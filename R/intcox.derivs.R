@@ -1,4 +1,4 @@
-`intcox.derivs` <-
+"intcox.derivs" <-
 function (data, covar, lambda0u, lambda0v, beta)        # derivatives and likelihood
 {
     eps <- 10^(-10)                                     # for numerical stability
@@ -58,4 +58,3 @@ function (data, covar, lambda0u, lambda0v, beta)        # derivatives and likeli
     derivs.ret <- list(l1 = l1, l2 = l2, g1 = g1, g2 = g2, likeli = likeli)
     return(derivs.ret)
 }
-

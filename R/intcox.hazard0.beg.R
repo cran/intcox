@@ -1,4 +1,4 @@
-`intcox.hazard0.beg` <-
+"intcox.hazard0.beg" <-
 function (t, data, rate)        # baseline hazard for the lower interval ends
 {
     mini <- min(data$left)
@@ -16,4 +16,3 @@ function (t, data, rate)        # baseline hazard for the lower interval ends
     }
     return(hazard0)
 }
-

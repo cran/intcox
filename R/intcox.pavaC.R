@@ -1,4 +1,4 @@
-`intcox.pavaC` <-
+"intcox.pavaC" <-
 function (w, y) 
 {
     n <- length(y)
@@ -8,4 +8,3 @@ function (w, y)
     .C("pavaC", as.double(w), as.double(y), as.integer(n), as.integer(index), 
         as.double(weight), as.double(ghat), PACKAGE = "intcox" )[[6]]
 }
-

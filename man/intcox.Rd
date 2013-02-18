@@ -11,10 +11,11 @@
   Intcox fits the Cox proportional hazards model for interval censored data by the Iterative Convex Minorant Algorithm (ICM)
 }
 \usage{
-intcox(formula = formula(data), data = parent.frame(), subset, na.action, x = FALSE, y = TRUE, epsilon = 1e-04, itermax = 10000, no.warnings = FALSE)
+intcox(formula = formula(data), data = parent.frame(), subset, na.action, 
+  x = FALSE, y = TRUE, epsilon = 1e-04, itermax = 10000, no.warnings = FALSE)
 }
 \arguments{
-  \item{formula}{ a formula object, with the response on the left of a \code{~} operator, and the terms on the right. 
+  \item{formula}{ a formula object, with the response on the left of a \code{~} operator, and the terms on the right.
                  The response must be a survival object of type \code{"interval2"} as returned by the \code{Surv} function. }
   \item{data}{ a data.frame in which to interpret the variables named in the \code{formula}, or in the \code{subset} argument.  }
   \item{subset}{ expression saying that only a subset of the rows of the data should be used in the fit. }
@@ -26,13 +27,13 @@ intcox(formula = formula(data), data = parent.frame(), subset, na.action, x = FA
   \item{no.warnings}{logical value indicating how to handle warnings. If \code{TRUE}, warnings will be displayed. Default is \code{FALSE}. }
 }
 \details{
-  With this package the Cox proportional hazards model can be applied for interval censored data. It tries to maximise the 
-  log-likelihood by a simultanious improvement of the coefficients and the cumulative hazard function in the gradient 
-  direction weighted by the main diagonal elements of the negative Hessian matrix. 
+  With this package the Cox proportional hazards model can be applied for interval censored data. It tries to maximise the
+  log-likelihood by a simultaneous improvement of the coefficients and the cumulative hazard function in the gradient
+  direction weighted by the main diagonal elements of the negative Hessian matrix.
 }
 \value{
-  an object of class \code{"coxph"}. See \code{\link[survival]{coxph.object}} for details. Not all features are realised. 
-  Additionally there are given 
+  an object of class \code{"coxph"}. See \code{\link[survival]{coxph.object}} for details. Not all features are realised.
+  Additionally there are given
   \item{lambda0 }{ estimated baseline hazard }
   \item{time.point }{corresponding time points for the steps}
   \item{likeli.vec }{vector of the estimated loglik of each step}
@@ -42,10 +43,9 @@ intcox(formula = formula(data), data = parent.frame(), subset, na.action, x = FA
   3 - algorithm did not converge - maximum number of iteration reached\cr
   4 - inside precondition(s) are not fulfilled at this iteration}
 }
-\references{ Wei Pan, (1999), Extending the Iterative Convex Minorant Algorithm to the Cox Model for Interval-Censored Data, 
+\references{ Wei Pan, (1999), Extending the Iterative Convex Minorant Algorithm to the Cox Model for Interval-Censored Data,
         Journal of Computational & Graphical Statistics, vol. 8, pp. 109-120 }
 \author{ Ch. Heiss, V. Henschel, U. Mansmann }
-
 \seealso{ \code{\link[survival]{coxph}}, \code{\link[survival]{Surv}} }
 \examples{
 data(intcox.example)

@@ -1,4 +1,4 @@
-"intcox.hazard0" <-
+intcox.hazard0 <-
 function (t, data, rate)        # baseline hazard
 {
     mini <- min(data$left)
@@ -6,7 +6,7 @@ function (t, data, rate)        # baseline hazard
     cumhaz <- c(0, rate$cumhaz)
     hazard0 <- NULL
     for (i in 1:length(t)) {
-        hazard0 <- c(hazard0, cumhaz[time.intv <= t[i]][length(cumhaz[time.intv <= 
+        hazard0 <- c(hazard0, cumhaz[time.intv <= t[i]][length(cumhaz[time.intv <=
             t[i]])])
     }
     return(hazard0)

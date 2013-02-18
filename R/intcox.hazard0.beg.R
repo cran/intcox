@@ -1,4 +1,4 @@
-"intcox.hazard0.beg" <-
+intcox.hazard0.beg <-
 function (t, data, rate)        # baseline hazard for the lower interval ends
 {
     mini <- min(data$left)
@@ -10,7 +10,7 @@ function (t, data, rate)        # baseline hazard for the lower interval ends
             hazard0 <- c(hazard0, 0)
         }
         else {
-            hazard0 <- c(hazard0, cumhaz[time.intv < t[i]][length(cumhaz[time.intv < 
+            hazard0 <- c(hazard0, cumhaz[time.intv < t[i]][length(cumhaz[time.intv <
                 t[i]])])
         }
     }

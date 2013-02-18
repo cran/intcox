@@ -18,23 +18,24 @@
   }
 }
 \details{
-The example dataset consists of 200 Weibull distributed random variables with \code{shape=0.75}, 
+The example dataset consists of 200 Weibull distributed random variables with \code{shape=0.75},
 while \code{scale} is derived from \eqn{(1/\lambda)^(1/shape)} with \eqn{\lambda = \exp{\beta_0+\beta'X}}
 where \eqn{\beta = {0.5,-0.5,0.5,0.5}'} and design matrix \code{X} which is formed by the four covariates.
 
-Furthermore, an interval was generated where the left interval end is zero 
-and the right interval end is defined by maximum value (\code{T.max}) of the which is got by 
-the 0.9-quantile of a Weibull r.v. with \code{shape=0.75} and \code{scale=median(scale)}. 
+Furthermore, an interval was generated where the left interval end is zero
+and the right interval end is defined by maximum value (\code{T.max}) of the which is got by
+the 0.9-quantile of a Weibull r.v. with \code{shape=0.75} and \code{scale=median(scale)}.
 
-If the value of event time \code{>=T.max} then the event time is right censored (\code{left=T.max} and \code{right=NA}). 
-Otherwise the interval \code{[0,T.max]} was randomly divided into subintervals (\code{grid=10}) in order to determine 
+If the value of event time \code{>=T.max} then the event time is right censored (\code{left=T.max} and \code{right=NA}).
+Otherwise the interval \code{[0,T.max]} was randomly divided into subintervals (\code{grid=10}) in order to determine
 the corresponding interval ends for each event time which is not right censored.
 
 The generating code is given below.
 }
 \examples{
 \dontrun{
-sim.weibull.intcox.rfc <-function (N=200,beta.0=0.1,beta.cov=c(0.5,-0.5,0.5,0.5),alpha=0.75,p.cov=c(0.5,0.75),grid=10)
+sim.weibull.intcox.rfc <-function (N=200,beta.0=0.1,beta.cov=c(0.5,-0.5,0.5,0.5),
+  alpha=0.75,p.cov=c(0.5,0.75),grid=10)
 {																		
   x.design<-cbind(rbinom(N,1,p.cov[1]),rbinom(N,1,p.cov[2]),runif(N,-1,1),rnorm(N,0,1))
   colnames(x.design)<-paste("x.",1:4,sep="")
@@ -50,7 +51,7 @@ sim.weibull.intcox.rfc <-function (N=200,beta.0=0.1,beta.cov=c(0.5,-0.5,0.5,0.5)
           x.left<-T.max
           x.right<-NA
       } else {
-          x.left<-max(tt[t.true[i]>tt])   
+          x.left<-max(tt[t.true[i]>tt])
           x.right<-min(tt[t.true[i]<tt])
       }
       t.left<-c(t.left,x.left)

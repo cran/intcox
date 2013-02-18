@@ -6,9 +6,9 @@
   Data on the shrinkage of
 aneurisms associated with cerebral arteriovenous malformations
 (cAVM) after treatment. The time to a shrinkage of the aneurism to
-below 50\% 
+below 50\%
 of the baseline volume was of interest.
-Several patients had multiple aneurisms. 
+Several patients had multiple aneurisms.
 }
 \usage{data(AA.data)}
 \format{

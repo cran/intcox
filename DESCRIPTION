@@ -1,16 +1,22 @@
 Package: intcox
+Type: Package
 Title: Iterated Convex Minorant Algorithm for interval censored event
         data
-Version: 0.9.2
-Date: 2009-06-05
-Author: Volkmar Henschel, Christiane Heiss, Ulrich Mansmann
-        <mansmann@ibe.med.uni-muenchen.de>
+Version: 0.9.3
+Date: 2013-02-18
+Authors@R:
+        c(person("Volkmar","Henschel",role=c("aut","cre"),email="vhenschel@gmx.de"),
+        person("Ulrich","Mansmann",role="aut",email="mansmann@ibe.med.uni-muenchen.de"),
+        person("Christiane","Heiss",role="ctb"))
 Description: Implementation of ICM-Algorithm by Wei Pan, J. Comp. & Gr.
         Stat. 78: 109-120, 1999 Algorithm for the Cox proportional
         hazard model for interval censored data
-Maintainer: Volkmar Henschel<vhenschel@gmx.de>
-License: GPL (>= 2)
-Depends: R (>= 1.7.0), survival
-Packaged: 2012-10-29 08:59:02 UTC; ripley
+Depends: R (>= 2.14.0), survival
+License: GPL-2
+Packaged: 2013-02-24 19:37:44 UTC; Volkmar
+Author: Volkmar Henschel [aut, cre], Ulrich Mansmann [aut], Christiane
+        Heiss [ctb]
+Maintainer: Volkmar Henschel <vhenschel@gmx.de>
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2012-10-29 08:59:02
+Date/Publication: 2013-02-25 07:34:20

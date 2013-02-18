@@ -1,4 +1,4 @@
-"intcox.breslow" <-
+intcox.breslow <-
 function (formula, data, covar)             # Breslow-Estimator
 {
     lokal.cens <- data$cens/3
@@ -9,7 +9,7 @@ function (formula, data, covar)             # Breslow-Estimator
     e <- exp(t(as.matrix(fit)) %*% t(covar))
     event.num <- cumsum(data$cens == 3)
     hazard.rate0 <- NULL
-    for (i in 1:max(event.num)) hazard.rate0 <- c(hazard.rate0, 
+    for (i in 1:max(event.num)) hazard.rate0 <- c(hazard.rate0,
         1/sum(e[i <= event.num]))
     cumhaz <- cumsum(hazard.rate0)
     breslow.ret <- list(cumhaz = cumhaz, fit = fit)

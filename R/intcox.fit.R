@@ -1,5 +1,5 @@
-"intcox.fit" <-
-function (formula, data, covar, eps, itermax)                       # Iterated Convex Minorant Algorithm 
+intcox.fit <-
+function (formula, data, covar, eps, itermax)                       # Iterated Convex Minorant Algorithm
 {
     folge <- sort.list(c(data$left, data$right[data$cens == 3]))    # sorting the pooled ends
     rang <- rank(c(data$left, data$right[data$cens == 3]))          # ranks of the pooled ends
@@ -16,9 +16,9 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
     abbruch <- 0                                                    # break condition not fulfilled
     while (abbruch == 0) {                                          # until the break condition is fulfilled
         it <- it + 1
-        if (it > itmax) 
+        if (it > itmax)
             abbruch <- 3
-        derivs.wert <- intcox.derivs(data, covar, lambda0u, lambda0v, 
+        derivs.wert <- intcox.derivs(data, covar, lambda0u, lambda0v,
             beta)                                                   # first and second derivatives and likelihood
         if (any(derivs.wert$g1 <= 0)) {
             abbruch <- 4
@@ -43,13 +43,13 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
         ind <- rep(1, length(lambda0g))
         if (abbruch == 0) {
             repeat {                                                # step size trials
-                lambda0g.new <- intcox.pavaC(derivs.wert$g1[folge], 
-                  pmax((lambda0g + alpha * g1.inv * derivs.wert$l1)[folge], 
+                lambda0g.new <- intcox.pavaC(derivs.wert$g1[folge],
+                  pmax((lambda0g + alpha * g1.inv * derivs.wert$l1)[folge],
                     null.vector))[rang]                             # PAVA with C
                 beta.neu <- beta + alpha * g2.inv * derivs.wert$l2
                 lambda0u.neu <- lambda0g.new[1:length(data$left)]
                 lambda0v.neu <- lambda0g.new[-(1:length(data$left))]
-                likeli.neu <- intcox.derivs(data, covar, lambda0u.neu, 
+                likeli.neu <- intcox.derivs(data, covar, lambda0u.neu,
                   lambda0v.neu, beta.neu)$likeli
                 likeli.diff <- likeli.neu - derivs.wert$likeli
                 if (is.na(likeli.diff)) {
@@ -70,23 +70,23 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
         }
         if (abbruch == 0) {
             alpha.u <- alpha * 1/2
-            lambda0g.u <- intcox.pavaC(derivs.wert$g1[folge], pmax((lambda0g + 
+            lambda0g.u <- intcox.pavaC(derivs.wert$g1[folge], pmax((lambda0g +
                 alpha.u * g1.inv * derivs.wert$l1)[folge], null.vector))[rang]  # PAVA with C
             beta.u <- beta + alpha.u * g2.inv * derivs.wert$l2
             lambda0u.u <- lambda0g.u[1:length(data$left)]
             lambda0v.u <- lambda0g.u[-(1:length(data$left))]
-            likeli.u <- intcox.derivs(data, covar, lambda0u.u, lambda0v.u, 
+            likeli.u <- intcox.derivs(data, covar, lambda0u.u, lambda0v.u,
                 beta.u)$likeli
             likeli.diff.u <- likeli.u - derivs.wert$likeli
         }
         if (abbruch == 0) {
             alpha.o <- alpha * 3/2
-            lambda0g.o <- intcox.pavaC(derivs.wert$g1[folge], pmax((lambda0g + 
+            lambda0g.o <- intcox.pavaC(derivs.wert$g1[folge], pmax((lambda0g +
                 alpha.o * g1.inv * derivs.wert$l1)[folge], null.vector))[rang]  # PAVA with C
             beta.o <- beta + alpha.o * g2.inv * derivs.wert$l2
             lambda0u.o <- lambda0g.o[1:length(data$left)]
             lambda0v.o <- lambda0g.o[-(1:length(data$left))]
-            likeli.o <- intcox.derivs(data, covar, lambda0u.o, lambda0v.o, 
+            likeli.o <- intcox.derivs(data, covar, lambda0u.o, lambda0v.o,
                 beta.o)$likeli
             likeli.diff.o <- likeli.o - derivs.wert$likeli
         }
@@ -117,16 +117,16 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
                 abbruch <- 4
             }
             else {
-                if (likeli.rel < eps) 
+                if (likeli.rel < eps)
                   abbruch <- 1                                  # if no break
             }
         }
     }
-    if (abbruch == 2) 
+    if (abbruch == 2)
         likeli.vec <- likeli.vec
     else likeli.vec <- c(likeli.vec, likeli.neu)
     time.point <- c(data$left, data$right[data$cens == 3])
-    if (abbruch == 2) 
+    if (abbruch == 2)
         lambda0 <- lambda0g
     else lambda0 <- lambda0g.new
     ordnung <- sort.list(time.point)
@@ -134,7 +134,7 @@ function (formula, data, covar, eps, itermax)                       # Iterated C
     lambda0 <- lambda0[ordnung]
     time.point <- time.point[!duplicated(lambda0)]
     lambda0 <- lambda0[!duplicated(lambda0)]
-    intcox.ret <- list(coefficients = beta, lambda0 = lambda0, time.point = time.point, 
+    intcox.ret <- list(coefficients = beta, lambda0 = lambda0, time.point = time.point,
         likeli.vec = likeli.vec, iter = it, termination = abbruch)
     return(intcox.ret)
 }
